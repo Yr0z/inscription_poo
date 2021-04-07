@@ -1,8 +1,40 @@
 <?php
 
+	class Verifier {
+
+		public static function syntaxeEmail($email) {	
+			
+			if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		public static function doublonEmail($email) {
+
+		}
+	}
+
+	// Verification envoi du formulaire
 	if(!empty($_POST['pseudo']) && !empty($_POST['email']) && !empty($_POST['password'])) {
 
+		// Variables
+		$pseudo 	= htmlspecialchars($_POST['pseudo']);
+		$email 		= htmlspecialchars($_POST['email']);
+		$password 	= htmlspecialchars($_POST['password']);
 
+		// Vérifier la syntaxe de l'email
+		if(!Verifier::syntaxeEmail($email)) {
+			header('location: index.php?error=true&message=Veuillez vérifier le format de votre adresse email.');
+			exit();
+		}
+
+		// Vérifier si doublon de l'email
+		if(Verifier::doublonEmail($email)) {
+			header('location: index.php?error=true&message=Cette adresse email est déjà utilisée.');
+			exit();
+		}
 		
 	}
 
