@@ -13,7 +13,7 @@
 
 		public static function doublonEmail($email) {
 
-			$bdd = new PDO ('mysql:host=localhost;dbname=poo;charset=utf8','root','');
+			require('src/connexion.php');
 
 			$requete = $bdd->prepare('SELECT COUNT(*) AS emailNumber FROM utilisateurs WHERE email = ?');
 			$requete->execute([$email]);
@@ -34,6 +34,63 @@
 		public static function encrypt($password) {
 			$password = "aq1".sha1($password."123")."25";
 		}
+	}
+
+	class Utilisateur {
+
+		// Attributs
+		private $_pseudo;
+		private $_email;
+		private $_password;
+
+		// Constructeur
+		public function __construct($pseudo, $email, $password) {
+
+			$this->setPseudo($pseudo);
+			$this->setEmail($email);
+			$this->setPassword($password);
+
+		}
+
+		// Getters
+		public function getPseudo() {
+			return $this->_pseudo;
+		}
+		public function getEmail() {
+			return $this->_email;
+		}
+		public function getPassword() {
+			return $this->_password;
+		}
+
+		// Setters
+		public function setPseudo($newPseudo) {
+			$this->_pseudo = $newPseudo;
+		}
+		public function setEmail($newEmail) {
+			$this->_pseudo = $newEmail;
+		}
+		public function setPassword($newPassword) {
+			$this->_pseudo = $newPassword;
+		}
+
+		// Methodes
+		public static function register($pseudo, $email, $password) {
+
+			$bdd = new PDO ('mysql:host=localhost;dbname=poo;charset=utf8','root','');
+			$inscription = $bdd->prepare('INSERT INTO utilisateurs (pseudo, email, password) VALUES (?, ?, ?)');
+			$inscription->execute([$pseudo, $email, $password]);
+
+			header('location: index.php?success=1');
+			exit();
+		}
+
+		public function createSessions() {
+			session_start();
+
+		}
+		
+
 	}
 
 	// Verification envoi du formulaire
@@ -58,6 +115,11 @@
 
 		// Chiffrement de mot de passe
 		Securite::encrypt($password);
+
+		// Enregistrement de l'utilisateur
+		$bdd = new PDO ('mysql:host=localhost;dbname=poo;charset=utf8','root','');
+
+		Utilisateur::register($pseudo, $email, $password);
 		
 	}
 
