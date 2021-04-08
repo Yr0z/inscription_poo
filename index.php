@@ -2,104 +2,10 @@
 
 	session_start();
 
-	class Verifier {
-
-		public static function syntaxeEmail($email) {	
-			
-			if(filter_var($email, FILTER_VALIDATE_EMAIL)){
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		public static function doublonEmail($email) {
-
-			require('src/connexion.php');
-
-			$requete = $bdd->prepare('SELECT COUNT(*) AS emailNumber FROM utilisateurs WHERE email = ?');
-			$requete->execute([$email]);
-
-			while($emailVerification = $requete->fetch()) {
-				
-				if($emailVerification['emailNumber'] != 0) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		}
-	}
-
-	class Securite {
-
-		public static function encrypt($password) {
-			return "aq1".sha1($password."123")."25";
-		}
-	}
-
-	class Utilisateur {
-
-		// Attributs
-		private $_pseudo;
-		private $_email;
-		private $_password;
-
-		// Constructeur
-		public function __construct($pseudo, $email, $password) {
-
-			$this->setPseudo($pseudo);
-			$this->setEmail($email);
-			$this->setPassword($password);
-
-		}
-
-		// Getters
-		public function getPseudo() {
-			return $this->_pseudo;
-		}
-		public function getEmail() {
-			return $this->_email;
-		}
-		public function getPassword() {
-			return $this->_password;
-		}
-
-		// Setters
-		public function setPseudo($newPseudo) {
-			$this->_pseudo = $newPseudo;
-		}
-		public function setEmail($newEmail) {
-			$this->_pseudo = $newEmail;
-		}
-		public function setPassword($newPassword) {
-			$this->_pseudo = $newPassword;
-		}
-
-		// Methodes
-		public function register($pseudo, $email, $password) {
-
-			require('src/connexion.php');
-			$inscription = $bdd->prepare('INSERT INTO utilisateurs (pseudo, email, password) VALUES (?, ?, ?)');
-			$inscription->execute([
-				$this->getPseudo(), 
-				$this->getEmail(), 
-				$this->getPassword()
-				]);
-
-			header('location: index.php?success=1');
-			exit();
-		}
-
-		public function createSessions() {
-
-			$_SESSION['connect'] 	= 1;
-			$_SESSION['pseudo'] 	= $this->getPseudo();
-			$_SESSION['email']		= $this->getEmail(); 
-
-		}
-		
-	}
+	// Inclure les classes
+	require_once('classes/Securite.php');
+	require_once('classes/Utilisateur.php');
+	require_once('classes/Verifier.php'); 
 
 	// Verification envoi du formulaire
 	if(!empty($_POST['pseudo']) && !empty($_POST['email']) && !empty($_POST['password'])) {
@@ -126,7 +32,7 @@
 
 		// Enregistrement de l'utilisateur
 		$utilisateur = new Utilisateur($pseudo, $email, $password);
-		$utilisateur->register($pseudo, $email, $password);
+		$utilisateur->register();
 		$utilisateur->createSessions();
 
 		// Rediriger
