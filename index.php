@@ -13,6 +13,19 @@
 
 		public static function doublonEmail($email) {
 
+			$bdd = new PDO ('mysql:host=localhost;dbname=poo;charset=utf8','root','');
+
+			$requete = $bdd->prepare('SELECT COUNT(*) AS emailNumber FROM utilisateurs WHERE email = ?');
+			$requete->execute([$email]);
+
+			while($emailVerification = $requete->fetch()) {
+				
+				if($emailVerification['emailNumber'] != 0) {
+					return true;
+				} else {
+					return false;
+				}
+			}
 		}
 	}
 
