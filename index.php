@@ -29,6 +29,13 @@
 		}
 	}
 
+	class Securite {
+
+		public static function encrypt($password) {
+			$password = "aq1".sha1($password."123")."25";
+		}
+	}
+
 	// Verification envoi du formulaire
 	if(!empty($_POST['pseudo']) && !empty($_POST['email']) && !empty($_POST['password'])) {
 
@@ -48,6 +55,9 @@
 			header('location: index.php?error=true&message=Cette adresse email est déjà utilisée.');
 			exit();
 		}
+
+		// Chiffrement de mot de passe
+		Securite::encrypt($password);
 		
 	}
 
