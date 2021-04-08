@@ -1,5 +1,7 @@
 <?php
 
+	session_start();
+
 	class Verifier {
 
 		public static function syntaxeEmail($email) {	
@@ -32,7 +34,7 @@
 	class Securite {
 
 		public static function encrypt($password) {
-			$password = "aq1".sha1($password."123")."25";
+			return "aq1".sha1($password."123")."25";
 		}
 	}
 
@@ -75,22 +77,28 @@
 		}
 
 		// Methodes
-		public static function register($pseudo, $email, $password) {
+		public function register($pseudo, $email, $password) {
 
-			$bdd = new PDO ('mysql:host=localhost;dbname=poo;charset=utf8','root','');
+			require('src/connexion.php');
 			$inscription = $bdd->prepare('INSERT INTO utilisateurs (pseudo, email, password) VALUES (?, ?, ?)');
-			$inscription->execute([$pseudo, $email, $password]);
+			$inscription->execute([
+				$this->getPseudo(), 
+				$this->getEmail(), 
+				$this->getPassword()
+				]);
 
 			header('location: index.php?success=1');
 			exit();
 		}
 
 		public function createSessions() {
-			session_start();
+
+			$_SESSION['connect'] 	= 1;
+			$_SESSION['pseudo'] 	= $this->getPseudo();
+			$_SESSION['email']		= $this->getEmail(); 
 
 		}
 		
-
 	}
 
 	// Verification envoi du formulaire
@@ -114,19 +122,20 @@
 		}
 
 		// Chiffrement de mot de passe
-		Securite::encrypt($password);
+		$password = Securite::encrypt($password);
 
 		// Enregistrement de l'utilisateur
-		$bdd = new PDO ('mysql:host=localhost;dbname=poo;charset=utf8','root','');
+		$utilisateur = new Utilisateur($pseudo, $email, $password);
+		$utilisateur->register($pseudo, $email, $password);
+		$utilisateur->createSessions();
 
-		Utilisateur::register($pseudo, $email, $password);
-		
+		// Rediriger
+		header('location: index.php?success=true');
+		exit();
+
 	}
 
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html>
